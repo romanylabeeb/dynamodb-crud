@@ -1,0 +1,38 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata":true,
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "lib": [
+            "es2019"
+        ],
+        "listEmittedFiles": true,
+        "listFiles": false,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "baseUrl": "src",
+        "rootDir": "src/",
+        "rootDirs": [
+            "src/"
+        ],
+        "outDir": "lib",
+        "removeComments": false,
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "strictNullChecks": true,
+        "target": "es2019",
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "node_modules",
+        "src/**/*.spec.?s",
+        "src/**/*.it.?s"
+    ]
+}
