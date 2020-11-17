@@ -46,14 +46,14 @@ export class DynamodDBMapperService {
      * Query 
      * @param queryParams 
      */
-    public async query(queryParams: QueryParameters): Promise<any> {
+    public async query(queryParams: QueryParameters,sortBy=null,sortOrder=""): Promise<any> {
         console.info("Query::queryParams:", JSON.stringify(queryParams))
         const iterator = this.mapper.query(
             queryParams.className,
             queryParams.keyCondition,
             queryParams.option
         );
-        return await this.getresult(iterator);
+        return await this.getresult(iterator,sortBy,sortOrder);
     }
     /**
      *  Query with pagination
@@ -89,14 +89,13 @@ export class DynamodDBMapperService {
      * Scan operation
      * @param scanParams 
      */
-    public async scan(scanParams: QueryParameters): Promise<any> {
+    public async scan(scanParams: QueryParameters,sortBy=null,sortOrder=""): Promise<any> {
         console.info("Scan::scanParams:", JSON.stringify(scanParams))
         const iterator = await this.mapper.scan(
             scanParams.className,
             scanParams.option
         );
-        return await this.getresult(iterator);
-
+        return await this.getresult(iterator,sortBy,sortOrder);
     }
     /**
      * Scan operation with pagination
@@ -166,15 +165,22 @@ export class DynamodDBMapperService {
         };
     }
 
-    private async getresult(iterator: QueryIterator<StringToAnyObjectMap>): Promise<any> {
-        let result: any = [];
+    private async getresult(iterator: QueryIterator<StringToAnyObjectMap>, sortBy, sortOrder): Promise<any> {
+        let itemList: any = [];
         for await (const record of iterator) {
             console.info("record:", record, "count", iterator.count, "scannedCount", iterator.scannedCount);
             record.forEach(value => {
-                result.push(value);
+                itemList.push(value);
             });
         }
-        return result;
+        if (sortBy) {
+            itemList.sort((objectA, objectB) => {
+                return Helper.compareObjects(objectA, objectB, sortBy, sortOrder);
+            })
+        }
+        return {
+            Items: itemList
+        };
     }
     private async getCount(iterator: QueryIterator<StringToAnyObjectMap>): Promise<number> {
         let result: any = 0;

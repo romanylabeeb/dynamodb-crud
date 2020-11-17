@@ -14,28 +14,37 @@ export class GenericRepository implements IGenericRepository {
         console.info("init GenericRepository")
     }
     /**
-     * Get List with pagination 
+     * Get Items with pagination  or wihthout pagination
      * using query if queryDTO contains the PK
      * using scan if queryDTO doesn't contain the PK
      * @param queryDTO 
      */
-    async getList(queryDTO: BaseQueryDTO): Promise<any> {
-        console.info(`${this.repoName}::getList`);
+    async getItems(queryDTO: BaseQueryDTO): Promise<any> {
+        console.info(`${this.repoName}::getItems`);
         try {
             let query: QueryParameters = queryDTO.getQueryParameters(this.modelName);
             let data: any = {}
+            if(queryDTO.rpp){
             if (query.query) {
                 data = await this.dynamodDBMapperService.queryWithPagination(query, queryDTO.rpp, queryDTO.pg, queryDTO.sortBy, queryDTO.sortOrder);
             } else {
                 data = await this.dynamodDBMapperService.scanWithPagination(query, queryDTO.rpp, queryDTO.pg, queryDTO.sortBy, queryDTO.sortOrder);
             }
+        }
+        else{
+            if (query.query) {
+                data = await this.dynamodDBMapperService.query(query,queryDTO.sortBy,queryDTO.sortOrder);
+            } else {
+                data = await this.dynamodDBMapperService.scan(query,queryDTO.sortBy,queryDTO.sortOrder);
+            } 
+        }
             console.info("data::", data);
             if (data.Items) {
                 return data.Items;
             }
         }
         catch (err) {
-            console.info(`${this.repoName}:getList::error::`, err);
+            console.info(`${this.repoName}:getItems::error::`, err);
             throw err;
         }
     }
@@ -44,8 +53,8 @@ export class GenericRepository implements IGenericRepository {
      * @param item 
      */
 
-    async putRecord(item: any): Promise<void> {
-        console.info(`${this.repoName}:putRecord`);
+    async putItem(item: any): Promise<void> {
+        console.info(`${this.repoName}:putItem`);
         try {
             await this.dynamodDBMapperService.put(item);
         }
@@ -58,9 +67,9 @@ export class GenericRepository implements IGenericRepository {
      * Update Item in DB
      * @param item 
      */
-    async updateRecord(item: any): Promise<any> {
+    async updateItem(item: any): Promise<any> {
         //UPDATE item to DB
-        console.info(`${this.repoName}:updateRecord`);
+        console.info(`${this.repoName}:updateItem`);
         return await this.dynamodDBMapperService.update(item);
     }
     /**
